@@ -3,7 +3,36 @@ import Head from "next/head";
 import {FaFacebookF, FaLinkedinIn, FaGoogle, FaRegEnvelope} from "react-icons/fa";
 import {MdLockOutline} from "react-icons/md";
 
+
 export default function Home() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const router = useRouter();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const { token } = await response.json();
+        localStorage.setItem('token', token);
+        router.push('/dashboard');
+      } else {
+        const data = await response.json();
+        setError(data.message || 'Login failed');
+      }
+    } catch (error) {
+      setError('An error occurred. Please try again.');
+    }
+  };
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
       <title>Unisprint</title>

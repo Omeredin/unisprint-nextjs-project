@@ -1,6 +1,15 @@
 import { useState } from "react";
+import { useRouter } from 'next/router';
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+    }
+  }, []);
   const [filters, setFilters] = useState({
     keywords: ["Math", "Starbucks", "Pick-up"],
     categories: ["Food Delivery", "Tutoring", "Other"],

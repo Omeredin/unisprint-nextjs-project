@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
+    "baseUrl": "./src",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./*"]  // This will point to all files under the src folder
     }
-  }
+  },
+  "include": [
+    "src/**/*"  // Make sure to include all files in the src folder
+  ]
 }

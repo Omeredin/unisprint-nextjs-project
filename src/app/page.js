@@ -13,7 +13,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
 
-  const handleSocialLogin = (provider) => {
+  const handleSocialLogin = async (provider) => {
     if (provider === 'google') {
       window.location.href = "http://localhost:3001/auth/google";
     }
@@ -22,7 +22,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setIsLoading(true);
-   
+
 
     try {
       const response = await fetch("http://localhost:3001/api/login", {

@@ -1,70 +1,66 @@
-import { useEffect, useState } from "react";
-import { useRouter } from 'next/router';
+'use client'
+
+import { useEffect, useState } from "react"
+import { useSearchParams, useRouter } from 'next/navigation'
+import axios from 'axios'
 
 export default function FrontPage() {
-  const router = useRouter();
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    // Handle the message from the popup window
-    const handleMessage = (event) => {
-      if (event.origin === 'http://localhost:3001') {
-        const { token, user } = event.data;
-        if (token) {
-          localStorage.setItem('token', token);
-          setUser(user);
-        }
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-
-    // Check for existing token
-    const token = localStorage.getItem('token');
-    if (!token) {
-      router.push('/login');
-    } else {
-      // Verify token and get user data
-      fetch('http://localhost:3001/api/user', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        credentials: 'include'
-      })
-        .then(res => {
-          if (!res.ok) {
-            throw new Error('Token invalid');
-          }
-          return res.json();
-        })
-        .then(userData => {
-          setUser(userData);
-        })
-        .catch(() => {
-          localStorage.removeItem('token');
-          router.push('/login');
-        });
-    }
-
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
-  }, [router]);
-
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState({
     keywords: ["Math", "Starbucks", "Pick-up"],
     categories: ["Food Delivery", "Tutoring", "Other"],
     priceRange: [0, 100],
     distance: [0, 25],
-  });
+  })
+
+  useEffect(() => {
+    // Check for token in search params
+    const tokenFromUrl = searchParams.get('token')
+    if (tokenFromUrl) {
+      localStorage.setItem('token', tokenFromUrl)
+      router.push('/frontpage') // Use push instead of replace in App Router
+      return
+    }
+
+    const token = localStorage.getItem('token')
+    if (!token) {
+      router.push('/') // Redirect to login page if no token
+      return
+    }
+
+    // Verify token and get user data
+    axios.get('http://localhost:3001/api/user', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      withCredentials: true
+    })
+    .then(response => {
+      setUser(response.data)
+    })
+    .catch(() => {
+      localStorage.removeItem('token')
+      router.push('/')
+    })
+    .finally(() => {
+      setLoading(false)
+    })
+  }, [router, searchParams])
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    router.push('/login');
-  };
+    localStorage.removeItem('token')
+    router.push('/')
+  }
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
 
   if (!user) {
-    return <div>Loading...</div>;
+    return <div>Loading user information...</div>
   }
 
   return (
@@ -74,7 +70,7 @@ export default function FrontPage() {
         <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-xl font-bold">UniSprint</h1>
           <div className="flex items-center space-x-4">
-            <span>{user?.email}</span>
+            <span>{user.email}</span>
             <button
               onClick={handleLogout}
               className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
@@ -180,5 +176,5 @@ export default function FrontPage() {
         </div>
       </main>
     </div>
-  );
+  )
 }

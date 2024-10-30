@@ -8,7 +8,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 require('dotenv').config();
-require('dotenv').config({ path: './signIn.env' });
+require('dotenv').config({ path: './process.env' });
 
 const app = express();
 
@@ -145,17 +145,19 @@ app.get('/auth/google',
 
 app.get('/auth/google/callback',
     passport.authenticate('google', {
-        failureRedirect: '/',
+        failureRedirect: 'http://localhost:3000', // Redirect to your login page on failure
         failureMessage: true,
         session: true
     }),
     (req, res) => {
         try {
+            // Check if user data is available
             if (!req.user || !req.user.email) {
                 console.error('No user data available');
-                return res.redirect('http://localhost:3000');
+                return res.redirect('http://localhost:3000'); // Redirect to login page
             }
 
+            // Create a JWT token
             const token = jwt.sign(
                 { 
                     email: req.user.email,
@@ -167,39 +169,11 @@ app.get('/auth/google/callback',
                 { expiresIn: '1h' }
             );
 
-            res.send(`
-                <html>
-                    <head>
-                        <title>Login Success</title>
-                        <script>
-                            try {
-                                if (window.opener) {
-                                    window.opener.postMessage({ 
-                                        token: '${token}',
-                                        user: {
-                                            email: '${req.user.email}',
-                                            displayName: '${req.user.displayName || ''}',
-                                            profilePicture: '${req.user.profilePicture || ''}'
-                                        }
-                                    }, 'http://localhost:3000');
-                                    window.close();
-                                } else {
-                                    window.location.href = 'http://localhost:3000/frontpage';
-                                }
-                            } catch (err) {
-                                console.error('Error:', err);
-                                window.location.href = 'http://localhost:3000/frontpage';
-                            }
-                        </script>
-                    </head>
-                    <body>
-                        <h1>Login Successful! Redirecting...</h1>
-                    </body>
-                </html>
-            `);
+            // Redirect to the frontpage with the token
+            res.redirect(`http://localhost:3000/frontpage?token=${token}`);
         } catch (error) {
             console.error('Callback error:', error);
-            res.redirect('http://localhost:3000');
+            res.redirect('http://localhost:3000'); // Redirect to login page on error
         }
     }
 );

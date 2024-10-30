@@ -36,4 +36,4 @@ yarn-error.log*
 next-env.d.ts
 
 # security passwords
-signIn.env
+src/app/process.env

@@ -4,11 +4,14 @@ import { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from 'next/navigation'
 import axios from 'axios'
 
+
+
 export default function FrontPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  
   const [filters, setFilters] = useState({
     keywords: ["Math", "Starbucks", "Pick-up"],
     categories: ["Food Delivery", "Tutoring", "Other"],
@@ -68,12 +71,12 @@ export default function FrontPage() {
       {/* Navigation Bar */}
       <nav className="bg-white shadow-lg p-4">
         <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-bold">UniSprint</h1>
+          <h1 className="text-xl font-bold text-blue-500">UniSprint</h1>
           <div className="flex items-center space-x-4">
-            <span>{user.email}</span>
+            <span className="text-blue-500">{user.email}</span>
             <button
               onClick={handleLogout}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+              className="px-4 py-2 bg-black text-white rounded-lg hover:bg-black"
             >
               Logout
             </button>
@@ -87,16 +90,16 @@ export default function FrontPage() {
           <input
             type="text"
             placeholder="Search"
-            className="w-full max-w-md p-2 border border-gray-300 rounded-lg"
+            className="w-full max-w-md p-2 border border-gray-300 rounded-lg text-black"
           />
           <div className="flex space-x-4">
-            <button className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
+            <button className="px-4 py-2 bg-black rounded-lg">
               + New
             </button>
-            <button className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
+            <button className="px-4 py-2 bg-black rounded-lg">
               Price ascending
             </button>
-            <button className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
+            <button className="px-4 py-2 bg-black rounded-lg hover:bg-gray-300">
               Price descending
             </button>
           </div>
@@ -105,7 +108,7 @@ export default function FrontPage() {
         {/* Main Section: Filters and Cards */}
         <div className="flex space-x-8">
           {/* Filter Section */}
-          <div className="w-1/4 p-4 bg-white shadow rounded-lg">
+          <div className="w-1/4 p-4 bg-white shadow rounded-lg text-black">
             <h3 className="font-bold mb-4">Keywords</h3>
             <div className="flex flex-wrap gap-2 mb-4">
               {filters.keywords.map((keyword, index) => (
@@ -165,11 +168,11 @@ export default function FrontPage() {
           {/* Cards Section */}
           <div className="w-3/4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, index) => (
-              <div key={index} className="bg-white shadow-lg p-6 rounded-lg hover:shadow-xl transition-shadow">
+              <div key={index} className="bg-white shadow-lg p-6 rounded-lg hover:shadow-xl transition-shadow text-black">
                 <h3 className="font-bold mb-2">Title</h3>
                 <p className="text-sm mb-2">Subtitle</p>
                 <p className="font-bold text-lg mb-4">$0</p>
-                <p className="text-sm">11/22/2002</p>
+                <p className="text-sm">01/01/9999</p>
               </div>
             ))}
           </div>
